@@ -2,19 +2,31 @@ package pl.gebert.lifetrack;
 
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class MainActivity extends Activity implements OnClickListener {
+import com.google.common.io.Files;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import pl.gebert.lifetrack.data.SensorData;
+
+public class MainActivity extends Activity implements OnClickListener,SensorEventListener {
 
     private SensorManager sensorManager;
     private Button buttonStart;
     private Button buttonStop;
     private Button buttonSave;
     private Button buttonReset;
+    File file;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +55,16 @@ public class MainActivity extends Activity implements OnClickListener {
                 buttonStop.setEnabled(true);
                 buttonSave.setEnabled(false);
                 buttonReset.setEnabled(false);
+                Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+                sensorManager.registerListener(this, accelerometer,SensorManager.SENSOR_DELAY_UI);
+                file = new File(getExternalFilesDir(null), "my-file-name.txt");
                 break;
             case R.id.buttonStop:
                 buttonStart.setEnabled(true);
                 buttonStop.setEnabled(false);
                 buttonSave.setEnabled(true);
                 buttonReset.setEnabled(true);
+                sensorManager.unregisterListener(this);
                 break;
             case R.id.buttonSave:
                 buttonStart.setEnabled(true);
@@ -65,5 +81,23 @@ public class MainActivity extends Activity implements OnClickListener {
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        float x = event.values[0]; // Acceleration force along the x axis (including gravity) m/s^2
+        float y = event.values[1]; // Acceleration force along the y axis (including gravity) m/s^2
+        float z = event.values[2]; // Acceleration force along the z axis (including gravity) m/s^2
+        SensorData data = new SensorData(x,y,z);
+        try {
+            Files.append(data.toString() + "\n", file, Charset.defaultCharset());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
