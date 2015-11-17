@@ -91,6 +91,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                 buttonStop.setEnabled(false);
                 buttonSave.setEnabled(false);
                 buttonReset.setEnabled(false);
+                collectedData.clear();
                 break;
             default:
                 break;
