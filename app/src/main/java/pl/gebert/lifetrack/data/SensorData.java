@@ -23,6 +23,6 @@ public class SensorData {
     }
 
     private String getCurrentTimeStamp() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(new Date());
+        return new SimpleDateFormat("HH:mm:ss.SSS").format(new Date());
     }
 }
