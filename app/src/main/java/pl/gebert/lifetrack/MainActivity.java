@@ -16,10 +16,14 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import pl.gebert.lifetrack.data.SensorData;
 
 public class MainActivity extends Activity implements OnClickListener,SensorEventListener {
+
+    private static final String fileNameSuffix = "_lt.csv";
 
     private SensorManager sensorManager;
     private Button buttonStart;
@@ -57,7 +61,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                 buttonReset.setEnabled(false);
                 Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
                 sensorManager.registerListener(this, accelerometer,SensorManager.SENSOR_DELAY_UI);
-                file = new File(getExternalFilesDir(null), "my-file-name.txt");
+                file = new File(getExternalFilesDir(null), generateFileName());
                 break;
             case R.id.buttonStop:
                 buttonStart.setEnabled(true);
@@ -99,5 +103,10 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    private String generateFileName(){
+        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        return date + fileNameSuffix;
     }
 }
