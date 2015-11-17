@@ -1,12 +1,14 @@
 package pl.gebert.lifetrack;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -17,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import pl.gebert.lifetrack.data.SensorData;
@@ -31,6 +34,12 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
     private Button buttonSave;
     private Button buttonReset;
     File file;
+    ProgressDialog progressBar;
+    private int progressBarStatus = 0;
+    private Handler progressBarHandler = new Handler();
+    private long fileSize = 0;
+    private ArrayList<SensorData> collectedData = new ArrayList<SensorData>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +84,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                 buttonStop.setEnabled(false);
                 buttonSave.setEnabled(false);
                 buttonReset.setEnabled(false);
+                saveCollectedData();
                 break;
             case R.id.buttonReset:
                 buttonStart.setEnabled(true);
@@ -92,12 +102,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
         float x = event.values[0]; // Acceleration force along the x axis (including gravity) m/s^2
         float y = event.values[1]; // Acceleration force along the y axis (including gravity) m/s^2
         float z = event.values[2]; // Acceleration force along the z axis (including gravity) m/s^2
-        SensorData data = new SensorData(x,y,z);
-        try {
-            Files.append(data.toString() + "\n", file, Charset.defaultCharset());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        collectedData.add(new SensorData(x,y,z));
     }
 
     @Override
@@ -108,5 +113,47 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
     private String generateFileName(){
         String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
         return date + fileNameSuffix;
+    }
+
+    private void saveCollectedData(){
+        prepareProgressBar();
+        progressBar.show();
+
+        new Thread(new Runnable() {
+            public void run() {
+                file = new File(getExternalFilesDir(null), generateFileName());
+                double dataSize = collectedData.size();
+                double progress = 1;
+                try {
+                    for(SensorData sd : collectedData){
+                        progressBarStatus = (int) (progress/dataSize * 100);
+                        progress++;
+                        Files.append(sd.toString() + "\n", file, Charset.defaultCharset());
+                        progressBarHandler.post(new Runnable() {
+                            public void run() {
+                                progressBar.setProgress(progressBarStatus);
+                            }
+                        });
+                    }
+                    Thread.sleep(1000); //sleep at the end of saving
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                progressBar.dismiss();
+            }
+        }).start();
+
+    }
+
+    private void prepareProgressBar() {
+        progressBar = new ProgressDialog(this);
+        progressBar.setCancelable(true);
+        progressBar.setMessage("Save in progress...");
+        progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressBar.setProgress(0);
+        progressBar.setMax(100);
+        progressBarStatus = 0;
     }
 }
