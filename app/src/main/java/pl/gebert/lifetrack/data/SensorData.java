@@ -1,8 +1,5 @@
 package pl.gebert.lifetrack.data;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * Created by Dominik Gebert on 2015-11-15.
  */
@@ -10,19 +7,17 @@ public class SensorData {
     float x;
     float y;
     float z;
-    final Date date = new Date();
+    float step;
+    final long time = System.currentTimeMillis();
 
-    public SensorData(float x, float y, float z){
+    public SensorData(float x, float y, float z, float step){
         this.x = x;
         this.y = y;
         this.z = z;
+        this.step = step;
     }
 
     public String toString() {
-        return getCurrentTimeStamp() + ", " + x + ", " + y + ", " + z;
-    }
-
-    private String getCurrentTimeStamp() {
-        return new SimpleDateFormat("HH:mm:ss.SSS").format(date);
+        return time + ", " + x + ", " + y + ", " + z; // + ", " + step ;
     }
 }

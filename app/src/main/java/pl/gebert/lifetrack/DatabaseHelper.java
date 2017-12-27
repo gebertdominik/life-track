@@ -29,9 +29,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CODE = "code";
     private static final String VALUE = "value";
 
-    private static final String WEIGHT_USER_PARAM_CODE = "WEIGHT";
+    public static final String WEIGHT_USER_PARAM_CODE = "WEIGHT";
     private static final String WEIGHT_USER_PARAM_DEFAULT_VALUE = "80";
 
+    public static final String HEIGHT_USER_PARAM_CODE = "HEIGHT";
+    public static final String HEIGHT_USER_PARAM_DEFAULT_VALUE = "175";
     //Clinics table create statement
     private static final String CREATE_TABLE_USER_PARAMS = "CREATE TABLE " + TABLE_USER_PARAMS + "(" +
             USER_PARAMETER_ID + " INTEGER PRIMARY KEY," +
@@ -41,6 +43,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String INSERT_WEIGHT_PARAMETER = "INSERT INTO " +TABLE_USER_PARAMS +
             " VALUES ( 1, \""+ WEIGHT_USER_PARAM_CODE + "\",\"" + WEIGHT_USER_PARAM_DEFAULT_VALUE +"\")";
 
+    private static final String INSERT_HEIGHT_PARAMETER = "INSERT INTO " +TABLE_USER_PARAMS +
+            " VALUES ( 2, \""+ HEIGHT_USER_PARAM_CODE + "\",\"" + HEIGHT_USER_PARAM_DEFAULT_VALUE +"\")";
+
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -49,6 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USER_PARAMS);
         db.execSQL(INSERT_WEIGHT_PARAMETER);
+        db.execSQL(INSERT_HEIGHT_PARAMETER);
     }
 
     @Override
@@ -86,7 +93,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String selectQuery = "SELECT * FROM " + TABLE_USER_PARAMS + " WHERE "
-                + CODE + " = " + code;
+                + CODE + " = \"" + code +"\"";
 
         Log.e(LOG, selectQuery);
         Cursor c = db.rawQuery(selectQuery, null);

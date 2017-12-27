@@ -38,4 +38,34 @@
         android:layout_alignBottom="@+id/buttonSave"
         android:layout_toEndOf="@+id/buttonSave" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:id="@+id/buttonSettings"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="0"
+        android:textStyle="bold"
+        android:textSize="60sp"
+        android:id="@+id/stepCount"
+        android:layout_marginTop="97dp"
+        android:layout_below="@+id/buttonStop"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="steps"
+        android:id="@+id/stepCountLabel"
+        android:layout_below="@+id/stepCount"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
