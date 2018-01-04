@@ -40,6 +40,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
     private Button buttonSave;
     private Button buttonReset;
     private Button buttonSettings;
+    private Button buttonFiles;
     private TextView stepCount;
     File file;
     ProgressDialog progressBar;
@@ -66,6 +67,8 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
         buttonSave = (Button) findViewById(R.id.buttonSave);
         buttonReset = (Button) findViewById(R.id.buttonReset);
         buttonSettings = (Button) findViewById(R.id.buttonSettings);
+        buttonFiles = (Button) findViewById(R.id.buttonFiles);
+
         stepCount = (TextView) findViewById(R.id.stepCount);
 
         buttonStart.setOnClickListener(this);
@@ -73,12 +76,14 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
         buttonSave.setOnClickListener(this);
         buttonReset.setOnClickListener(this);
         buttonSettings.setOnClickListener(this);
+        buttonFiles.setOnClickListener(this);
 
         buttonStart.setEnabled(true);
         buttonStop.setEnabled(false);
         buttonSave.setEnabled(false);
         buttonReset.setEnabled(false);
         buttonSettings.setEnabled(true);
+        buttonFiles.setEnabled(true);
     }
 
     @Override
@@ -124,8 +129,12 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                 collectedData.clear();
                 break;
             case R.id.buttonSettings:
-                Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
+            case R.id.buttonFiles:
+                Intent filesIntent = new Intent(this, FilePickActivity.class);
+                startActivity(filesIntent);
                 break;
             default:
                 break;
