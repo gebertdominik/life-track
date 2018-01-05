@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -182,9 +183,14 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                     }
                     Thread.sleep(1000); //sleep at the end of saving
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Log.e("MainActivity",
+                            "The thread is interrupted: " + e.getMessage());
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e("MainActivity",
+                            "The  file can't be created: " + e.getMessage());
+                } catch (Exception e) {
+                    Log.e("MainActivity",
+                            "Unexpected exception " + e.getMessage());
                 }
                 progressBar.dismiss();
             }
