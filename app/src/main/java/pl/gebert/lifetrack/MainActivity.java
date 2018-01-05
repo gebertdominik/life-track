@@ -154,7 +154,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
     }
 
     private String generateFileName(){
-        String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        String date = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         date += "_" + UUID.randomUUID().toString().replace("-","").substring(0,10);
         return date + fileNameSuffix;
     }
