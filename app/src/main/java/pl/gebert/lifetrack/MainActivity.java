@@ -38,7 +38,6 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
     private Button buttonStop;
     private Button buttonSave;
     private Button buttonReset;
-    private Button buttonSettings;
     private Button buttonFiles;
     private TextView stepCount;
     File file;
@@ -54,8 +53,6 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DatabaseHelper db = DatabaseHelper.getInstance(getApplicationContext());
-        db.clearData();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -65,7 +62,6 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
         buttonStop = (Button) findViewById(R.id.buttonStop);
         buttonSave = (Button) findViewById(R.id.buttonSave);
         buttonReset = (Button) findViewById(R.id.buttonReset);
-        buttonSettings = (Button) findViewById(R.id.buttonSettings);
         buttonFiles = (Button) findViewById(R.id.buttonFiles);
 
         stepCount = (TextView) findViewById(R.id.stepCount);
@@ -74,14 +70,12 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
         buttonStop.setOnClickListener(this);
         buttonSave.setOnClickListener(this);
         buttonReset.setOnClickListener(this);
-        buttonSettings.setOnClickListener(this);
         buttonFiles.setOnClickListener(this);
 
         buttonStart.setEnabled(true);
         buttonStop.setEnabled(false);
         buttonSave.setEnabled(false);
         buttonReset.setEnabled(false);
-        buttonSettings.setEnabled(true);
         buttonFiles.setEnabled(true);
     }
 
@@ -93,7 +87,6 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                 buttonStop.setEnabled(true);
                 buttonSave.setEnabled(false);
                 buttonReset.setEnabled(false);
-                buttonSettings.setEnabled(false);
                 wakeLock = createWakeLock();
                 Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
                 Sensor stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -116,7 +109,6 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                 buttonStop.setEnabled(false);
                 buttonSave.setEnabled(false);
                 buttonReset.setEnabled(false);
-                buttonSettings.setEnabled(true);
                 saveCollectedData();
                 break;
             case R.id.buttonReset:
@@ -124,12 +116,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                 buttonStop.setEnabled(false);
                 buttonSave.setEnabled(false);
                 buttonReset.setEnabled(false);
-                buttonSettings.setEnabled(true);
                 collectedData.clear();
-                break;
-            case R.id.buttonSettings:
-                Intent settingsIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsIntent);
                 break;
             case R.id.buttonFiles:
                 Intent filesIntent = new Intent(this, FilePickActivity.class);

@@ -37,15 +37,6 @@
                 <data android:mimeType="image/*" />-->
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="pl.gebert.lifetrack.MainActivity" />
-        </activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
