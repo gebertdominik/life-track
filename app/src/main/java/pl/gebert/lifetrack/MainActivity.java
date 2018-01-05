@@ -31,7 +31,6 @@ import pl.gebert.lifetrack.data.SensorData;
 public class MainActivity extends Activity implements OnClickListener,SensorEventListener {
 
     private static final String fileNameSuffix = "_lt.csv";
-    public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
 
     private SensorManager sensorManager;
     private PowerManager.WakeLock wakeLock;
@@ -100,7 +99,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                 Sensor stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
                 isFirstStep = true;
                 actualStepCount = 0.0f;
-                sensorManager.registerListener(this, accelerometer,SensorManager.SENSOR_DELAY_GAME);
+                sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
                 sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
                 file = new File(getExternalFilesDir(null), generateFileName());
                 break;
@@ -148,11 +147,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
             float x = event.values[0]; // Acceleration force along the x axis (without gravity) m/s^2
             float y = event.values[1]; // Acceleration force along the y axis (without gravity) m/s^2
             float z = event.values[2]; // Acceleration force along the z axis (without gravity) m/s^2
-          //  collectedData.add(new SensorData(x, y, z, actualStepCount)); //TODO actualStepCount ustawiany na 0
-            try {
-                Files.append(System.currentTimeMillis() + ", " + x + ", " + y + ", " + z + "\n", file, Charset.defaultCharset());
-            }catch (Exception e)
-            {}
+            collectedData.add(new SensorData(x, y, z, actualStepCount));
 
         }
          else if(sensor.getType() == Sensor.TYPE_STEP_COUNTER){
@@ -190,7 +185,8 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
                     for(SensorData sd : collectedData){
                         progressBarStatus = (int) (progress/dataSize * 100);
                         progress++;
-                        Files.append(sd.toString() + "\n", file, Charset.defaultCharset());
+                        Files.append(sd.toString(), file, Charset.defaultCharset());
+
                         progressBarHandler.post(new Runnable() {
                             public void run() {
                                 progressBar.setProgress(progressBarStatus);
