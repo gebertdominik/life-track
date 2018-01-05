@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,23 +32,27 @@ import pl.gebert.lifetrack.data.SensorData;
 
 public class MainActivity extends Activity implements OnClickListener,SensorEventListener {
 
-    private static final String fileNameSuffix = "_lt.csv";
-
+    //Managers
     private SensorManager sensorManager;
     private PowerManager.WakeLock wakeLock;
+
+    //UI Elements
     private Button buttonStart;
     private Button buttonStop;
     private Button buttonSave;
     private Button buttonReset;
     private Button buttonFiles;
     private TextView stepCount;
-    File file;
-    ProgressDialog progressBar;
+
+    //File saving fields
+    private File file;
+    private ProgressDialog progressBar;
     private int progressBarStatus = 0;
     private Handler progressBarHandler = new Handler();
-    private long fileSize = 0;
-    private LinkedList<SensorData> collectedData = new LinkedList<SensorData>();
+    private static final String fileNameSuffix = "_lt.csv";
+    private LinkedList<SensorData> collectedData = new LinkedList<>();
 
+    //Step fields
     private float startStepCount;
     private float actualStepCount;
     private boolean isFirstStep;
@@ -59,13 +64,12 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
         setContentView(R.layout.activity_main);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        buttonStart = (Button) findViewById(R.id.buttonStart);
-        buttonStop = (Button) findViewById(R.id.buttonStop);
-        buttonSave = (Button) findViewById(R.id.buttonSave);
-        buttonReset = (Button) findViewById(R.id.buttonReset);
-        buttonFiles = (Button) findViewById(R.id.buttonFiles);
-
-        stepCount = (TextView) findViewById(R.id.stepCount);
+        buttonStart = findViewById(R.id.buttonStart);
+        buttonStop = findViewById(R.id.buttonStop);
+        buttonSave = findViewById(R.id.buttonSave);
+        buttonReset = findViewById(R.id.buttonReset);
+        buttonFiles = findViewById(R.id.buttonFiles);
+        stepCount = findViewById(R.id.stepCount);
 
         buttonStart.setOnClickListener(this);
         buttonStop.setOnClickListener(this);
@@ -84,50 +88,69 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.buttonStart:
-                buttonStart.setEnabled(false);
-                buttonStop.setEnabled(true);
-                buttonSave.setEnabled(false);
-                buttonReset.setEnabled(false);
-                wakeLock = createWakeLock();
-                Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-                Sensor stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-                isFirstStep = true;
-                actualStepCount = 0.0f;
-                sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
-                sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
-                file = new File(getExternalFilesDir(null), generateFileName());
+                buttonStartPressed();
                 break;
             case R.id.buttonStop:
-                buttonStart.setEnabled(true);
-                buttonStop.setEnabled(false);
-                buttonSave.setEnabled(true);
-                buttonReset.setEnabled(true);
-                sensorManager.unregisterListener(this);
-                wakeLock.release();
+                buttonStopPressed();
                 break;
             case R.id.buttonSave:
-                buttonStart.setEnabled(true);
-                buttonStop.setEnabled(false);
-                buttonSave.setEnabled(false);
-                buttonReset.setEnabled(false);
-                saveCollectedData();
+                buttonSavePressed();
                 break;
             case R.id.buttonReset:
-                buttonStart.setEnabled(true);
-                buttonStop.setEnabled(false);
-                buttonSave.setEnabled(false);
-                buttonReset.setEnabled(false);
-                collectedData.clear();
+                buttonResetPressed();
                 break;
             case R.id.buttonFiles:
-                Intent filesIntent = new Intent(this, FilePickActivity.class);
-                startActivity(filesIntent);
+                buttonFilesPressed();
                 break;
             default:
                 break;
         }
     }
 
+    private void buttonStartPressed() {
+        buttonStart.setEnabled(false);
+        buttonStop.setEnabled(true);
+        buttonSave.setEnabled(false);
+        buttonReset.setEnabled(false);
+        wakeLock = createWakeLock();
+        Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        Sensor stepCounter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        isFirstStep = true;
+        actualStepCount = 0.0f;
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, stepCounter, SensorManager.SENSOR_DELAY_NORMAL);
+        file = new File(getExternalFilesDir(null), generateFileName());
+        return;
+    }
+
+    private void buttonStopPressed() {
+        buttonStart.setEnabled(true);
+        buttonStop.setEnabled(false);
+        buttonSave.setEnabled(true);
+        buttonReset.setEnabled(true);
+        sensorManager.unregisterListener(this);
+        wakeLock.release();
+    }
+    private void buttonSavePressed() {
+        buttonStart.setEnabled(true);
+        buttonStop.setEnabled(false);
+        buttonSave.setEnabled(false);
+        buttonReset.setEnabled(false);
+        saveCollectedData();
+    }
+
+    private void buttonResetPressed() {
+        buttonStart.setEnabled(true);
+        buttonStop.setEnabled(false);
+        buttonSave.setEnabled(false);
+        buttonReset.setEnabled(false);
+        collectedData.clear();
+    }
+
+    private void buttonFilesPressed() {
+        Intent filesIntent = new Intent(this, FilePickActivity.class);
+        startActivity(filesIntent);
+    }
     @Override
     public void onSensorChanged(SensorEvent event) {
         Sensor sensor = event.sensor;
@@ -154,6 +177,7 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
 
     }
 
+    @NonNull
     private String generateFileName(){
         String date = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         date += "_" + UUID.randomUUID().toString().replace("-","").substring(0,10);
@@ -167,21 +191,8 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
         new Thread(new Runnable() {
             public void run() {
                 file = new File(getExternalFilesDir(null), generateFileName());
-                double dataSize = collectedData.size();
-                double progress = 1;
                 try {
-                    for(SensorData sd : collectedData){
-                        progressBarStatus = (int) (progress/dataSize * 100);
-                        progress++;
-                        Files.append(sd.toString(), file, Charset.defaultCharset());
-
-                        progressBarHandler.post(new Runnable() {
-                            public void run() {
-                                progressBar.setProgress(progressBarStatus);
-                            }
-                        });
-                    }
-                    Thread.sleep(1000); //sleep at the end of saving
+                    saveActivityFile();
                 } catch (InterruptedException e) {
                     Log.e("MainActivity",
                             "The thread is interrupted: " + e.getMessage());
@@ -196,6 +207,23 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
             }
         }).start();
 
+    }
+
+    private void saveActivityFile() throws IOException, InterruptedException {
+        double dataSize = collectedData.size();
+        double progress = 1;
+        for(SensorData sd : collectedData){
+            progressBarStatus = (int) (progress/dataSize * 100);
+            progress++;
+            Files.append(sd.toString(), file, Charset.defaultCharset());
+
+            progressBarHandler.post(new Runnable() {
+                public void run() {
+                    progressBar.setProgress(progressBarStatus);
+                }
+            });
+        }
+        Thread.sleep(1000); //sleep at the end of saving
     }
 
     private void prepareProgressBar() {
