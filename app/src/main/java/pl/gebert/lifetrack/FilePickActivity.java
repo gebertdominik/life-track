@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class FilePickActivity extends Activity {
             listItems.add(file.getName());
             filenamePathMap.put(file.getName(),file.getAbsolutePath());
         }
+        Collections.sort(listItems);
         fileListViewAdapter = new ArrayAdapter<String>(this, R.layout.file_list_item, listItems);
         fileListView.setAdapter(fileListViewAdapter);
         fileListView.setClickable(true);
