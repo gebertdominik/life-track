@@ -13,6 +13,8 @@ import android.widget.ListView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FilePickActivity extends Activity {
     private ListView fileListView;
@@ -20,6 +22,7 @@ public class FilePickActivity extends Activity {
     private File filesDir;
     File[] files;
     ArrayList<String> listItems = new ArrayList<String>();
+    Map<String,String> filenamePathMap = new HashMap<String,String>();
     Intent shareIntent;
 
     @Override
@@ -27,13 +30,14 @@ public class FilePickActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file_pick);
         shareIntent = new Intent(Intent.ACTION_SEND);
-        fileListView = (ListView) findViewById(R.id.fileList);
+        fileListView = findViewById(R.id.fileList);
 
         filesDir = getExternalFilesDir(null);
         files = filesDir.listFiles();
 
         for (File file : files) {
-            listItems.add(file.getAbsolutePath());
+            listItems.add(file.getName());
+            filenamePathMap.put(file.getName(),file.getAbsolutePath());
         }
         fileListViewAdapter = new ArrayAdapter<String>(this, R.layout.file_list_item, listItems);
         fileListView.setAdapter(fileListViewAdapter);
@@ -42,12 +46,12 @@ public class FilePickActivity extends Activity {
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int position, long rowId) {
-                        File requestFile = new File(listItems.get(position));
+                        File requestFile = new File(filenamePathMap.get(listItems.get(position)));
                         try {
                             Uri fileUri = FileProvider.getUriForFile(FilePickActivity.this,"pl.gebert.lifetrack.FileProvider", requestFile);
                             if (fileUri != null) {
                                 shareIntent = crateFileShareIntent(fileUri);
-                                startActivity(Intent.createChooser(shareIntent, "Share with..."));
+                                startActivity(Intent.createChooser(shareIntent, "Share file"));
                                 FilePickActivity.this.setResult(Activity.RESULT_OK, shareIntent);
                             } else {
                                 shareIntent.setDataAndType(null, "");
@@ -55,10 +59,11 @@ public class FilePickActivity extends Activity {
                             }
 
                         } catch (IllegalArgumentException e) {
-                            Log.e("File Selector",
-                                    "The selected file can't be shared");
+                            Log.e("FilePickActivity",
+                                    "The selected file can't be shared: " + e.getMessage());
                         } catch (Exception e) {
-                            System.out.println("trololo");
+                            Log.e("FilePickActivity",
+                                    "Unexpected exception: " + e.getMessage());
                         }
                     }
                 });
