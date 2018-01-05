@@ -18,6 +18,6 @@ public class SensorData {
     }
 
     public String toString() {
-        return time + ", " + x + ", " + y + ", " + z; // + ", " + step ;
+        return time + ", " + x + ", " + y + ", " + z + "\n";
     }
 }
