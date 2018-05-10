@@ -155,9 +155,9 @@ public class MainActivity extends Activity implements OnClickListener,SensorEven
     public void onSensorChanged(SensorEvent event) {
         Sensor sensor = event.sensor;
         if(sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            float x = event.values[0]; // Acceleration force along the x axis (without gravity) m/s^2
-            float y = event.values[1]; // Acceleration force along the y axis (without gravity) m/s^2
-            float z = event.values[2]; // Acceleration force along the z axis (without gravity) m/s^2
+            float x = event.values[0]; // Acceleration force along the x axis m/s^2
+            float y = event.values[1]; // Acceleration force along the y axis m/s^2
+            float z = event.values[2]; // Acceleration force along the z axis m/s^2
             collectedData.add(new SensorData(x, y, z, actualStepCount));
 
         }
